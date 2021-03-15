@@ -41,7 +41,7 @@ export class DoorStatus {
                 .replace("days", "dagar")
                 .replace("day", "dag")
                 .replace("hour", "timme")
-                .replace("minute", "minut")
+                .replace("minute ", "minut ")
                 .replace("second", "sekund");
     }
 
