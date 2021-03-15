@@ -48,4 +48,4 @@ deploy:
   image: curlimages/curl
   stage: deploy
   script:
-    - curl -X POST http://192.168.1.5:9000/api/webhooks/bc831869-2859-4e04-9b6c-9482b2f279e5
+    - curl -X POST https://192.168.1.5:9000/api/webhooks/2b3edebd-fbb5-4e49-acd0-98219635a485

@@ -49,7 +49,7 @@ export class Command {
     }
 
     help(prefix: string): string {
-        let ret: string = this.name + ": `" + (prefix + " " + this.aliasStr + " " + this.argDescription).trim() + "` - " + this._help;
+        let ret: string = this.name + ": `" + (prefix + this.aliasStr + " " + this.argDescription).trim() + "` - " + this._help;
         return ret;
     }
 
