@@ -34,7 +34,7 @@ export class DoorStatus {
     }
 
     get message() {
-        return "Chassit är " + (this.status ? "Öppet" : "Stängt") + " och har varit det i "
+        return "Chassit är " + (this.status ? "öppet" : "stängt") + " och har varit det i "
             + this.duration_str.replace("minutes", "minuter")
                 .replace("seconds", "sekunder")
                 .replace("hours", "timmar")
