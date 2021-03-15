@@ -6,6 +6,6 @@ export default cmd
 
 export async function resolve(message: Discord.Message, args: string[]) {
     hdClient.door.then(res => {
-        message.channel.send(res.message);
+        message.channel.send("<@" + message.author.id + "> "+res.message);
     })
 }

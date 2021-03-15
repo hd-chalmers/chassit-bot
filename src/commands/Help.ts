@@ -1,6 +1,7 @@
 import Discord = require('discord.js');
 import {Command} from "../tools/Command.js";
 import {commands, prefix} from "../bot";
+import master from "./Master"
 let cmd:Command = new Command("Help", "", "Shows this help message", ["help"], [], getHelp);
 export default cmd
 
@@ -10,7 +11,7 @@ export async function getHelp(message: Discord.Message, args: string[]) {
     msg += "The bots status will reflect the door status (Online=open, DND=closed)\n"
     msg += "The following commands are currently supported:\n";
     commands.forEach((command: Command) => {
-        if (!handled.has(command.name) && command.name != cmd.name) {
+        if (!handled.has(command.name) && command.name != cmd.name && command.name != master.name) {
             msg += "\t* " + command.help(prefix).trim() + "\n";
             handled.set(command.name, command)
         }
