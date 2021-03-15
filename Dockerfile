@@ -1,7 +1,7 @@
 # This file is a template, and might need editing before it works on your project.
 FROM node:14
 
-ENV COMMAND_PREFIX=?rp DISCORD_TOKEN=missing
+ENV COMMAND_PREFIX=! DISCORD_TOKEN=missing
 
 WORKDIR /usr/src/app
 
