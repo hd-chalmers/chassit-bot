@@ -7,7 +7,7 @@ export async function getRandomQuote(threshHold: number): Promise<MessageEmbed> 
     let promise: Promise<MessageEmbed>;
     await axios.get(url).then(res => {
         promise = new Promise((resolve) => {
-            ret.addField(res.data.quote, res.data.context)
+            ret.addField(res.data.quote.replace("</br>", "\n"), res.data.context)
             ret.setFooter("Rating: " + res.data.rating);
             resolve(ret);
         });
