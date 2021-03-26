@@ -24,8 +24,6 @@ build:resources:
 docker:
   image: docker:git
   stage: docker
-  services:
-    - docker:dind
   dependencies:
     - build:resources
   needs:
