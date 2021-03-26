@@ -46,4 +46,4 @@ deploy:
   image: curlimages/curl
   stage: deploy
   script:
-    - curl -X POST http://example.com
+    - curl -X POST http://10.13.37.4:9000/api/webhooks/4d0fb6cf-dceb-4987-9eb8-a12d4a1102c1
