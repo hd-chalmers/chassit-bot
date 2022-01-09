@@ -12,7 +12,7 @@ build:resources:
   before_script:
     - apt-get update
   script:
-    - npm install --cache ../.npm-cache
+    - npm install --include=dev --cache ../.npm-cache
     - npm run build
   artifacts:
     untracked: true

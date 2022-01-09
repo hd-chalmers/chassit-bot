@@ -1,28 +1,45 @@
 {
-  "name": "Chassit",
+  "name": "chassit-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/bot.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node dist/bot.js",
-    "clean": "rm -rf dist/*"
-  },
   "keywords": [],
+  "homepage": "",
+  "bugs": {},
+  "repository": {},
+  "license": "",
   "author": "",
-  "license": "ISC",
-  "private": true,
+  "contributors": [
+    ""
+  ],
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "build:changelog": "npx @discordx/changelog --root=src",
+    "dev": "node --loader ts-node/esm/transpile-only src/main.ts",
+    "start": "nodemon --exec node --loader ts-node/esm/transpile-only src/main.ts",
+    "serve": "node build/main.js"
+  },
   "dependencies": {
-    "axios": "^0.21.1",
-    "discord.js": "12.5.1",
-    "request": "^2.88.2",
-    "source-map-loader": "^2.0.1"
+    "@discordx/importer": "^1.1.2",
+    "@discordx/pagination": "^1.1.0",
+    "@discordx/utilities": "^3.3.0",
+    "discord.js": "^13.5.0",
+    "discordx": "^9.1.9",
+    "dotenv": "^10.0.0",
+    "formdata-node": "^4.3.2",
+    "node-fetch": "^3.1.0",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/node": "^14.14.32",
-    "@types/request": "^2.48.5",
-    "ts-loader": "^8.0.17",
-    "typescript": "^4.2.3"
+    "@discordx/changelog": "^2.0.6",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
   }
 }

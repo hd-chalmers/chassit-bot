@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from "axios";
+import fetch from "node-fetch";
 
 export default class HDClient {
     private _token: string;
@@ -10,7 +10,7 @@ export default class HDClient {
 
     get door(): Promise<DoorStatus> {
         return new Promise((resolve, reject) => {
-            axios.get(this._endpoint + "/door").then(res => {
+            fetch(this._endpoint + "/door").then(res => res.json()).then(res => {
                 resolve(new DoorStatus(res));
             }).catch(err => {
                 reject(err);
@@ -20,32 +20,33 @@ export default class HDClient {
 }
 
 export class DoorStatus {
-    private readonly _status: boolean;
+    private readonly _status: boolean | null;
     private readonly _duration: number;
     private readonly _duration_str: string;
     private readonly _updated: Date;
 
-    constructor(response: AxiosResponse) {
-        let data = response.data;
-        this._status = data.status;
-        this._duration = data.duration;
-        this._duration_str = data.duration_str;
-        this._updated = new Date(data.updated);
+    constructor(response: any) {
+        this._status = response.status;
+        this._duration = response.duration;
+        this._duration_str = response.duration_str;
+        this._updated = new Date(response.updated);
     }
 
     get message() {
-        return "Chassit är " + (this.status ? "öppet" : "stängt") + " och har varit det i "
-            + this.duration_str.replace("minutes", "minuter")
-                .replace("seconds", "sekunder")
-                .replace("hours", "timmar")
-                .replace("days", "dagar")
-                .replace("day", "dag")
-                .replace("hour", "timme")
-                .replace("minute ", "minut ")
-                .replace("second", "sekund");
+        return `Chassit är ${this.statusTxt} och har varit det i ${this._duration_str} (<t:${new Date(this._updated).getTime() / 1000}:R>)`
     }
 
-    get status(): boolean {
+    private get statusTxt(): "öppet" | "stängt" | "okänt"{
+        if(this._status === true){
+            return 'öppet'
+        } else if(this._status === false){
+            return 'stängt'
+        } else {
+            return 'okänt'
+        }
+    }
+
+    get status(): boolean | null {
         return this._status;
     }
 

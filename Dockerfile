@@ -1,13 +1,15 @@
-# This file is a template, and might need editing before it works on your project.
-FROM node:14
+FROM node:17-alpine
 
-ENV COMMAND_PREFIX=! DISCORD_TOKEN=missing
+ENV COMMAND_PREFIX=! BOT_TOKEN=missing
 
+# Create app directory
 WORKDIR /usr/src/app
 
-ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+# Move all files
+COPY ./dist /usr/src/app/
+COPY ./package.json /usr/src/app/
+COPY ./package-lock.json /usr/src/app/
+COPY ./node_modules /usr/src/app/node_modules
 
-COPY . /usr/src/app
-
-CMD [ "npm", "start" ]
+# Start bot
+CMD [ "node", "main.js" ]

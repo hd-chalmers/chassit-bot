@@ -1,22 +1,52 @@
-import Discord = require('discord.js');
-import {Command} from "../tools/Command.js";
-import {commands, prefix} from "../bot";
-import master from "./Master"
-let cmd:Command = new Command("Help", "", "Shows this help message", ["help"], [], getHelp);
-export default cmd
+import { CommandInteraction, MessageEmbed } from "discord.js";
+import {Discord, MetadataStorage, SimpleCommand, SimpleCommandMessage, Slash, SlashChoice, SlashOption} from "discordx";
+import { Pagination } from "@discordx/pagination";
 
-export async function getHelp(message: Discord.Message, args: string[]) {
-    let msg: string = "<@" + message.author.id + ">\n";
-    let handled: Map<string, Command> = new Map<string, Command>()
-    msg += "The bots status will reflect the door status (Online=open, DND=closed)\n"
-    msg += "The following commands are currently supported:\n";
-    commands.forEach((command: Command) => {
-        if (!handled.has(command.name) && command.name != cmd.name && command.name != master.name) {
-            msg += "\t* " + command.help(prefix).trim() + "\n";
-            handled.set(command.name, command)
-        }
+@Discord()
+export abstract class HelpCMD {
+  // example: pagination for all slash command
+  @Slash("help", { description: "Få en beskrivning om alla kommandon" })
+  async pages(
+      @SlashChoice('alla', 'alla')
+      @SlashOption('synlighet', {description: 'Lägg till "alla" för att ha meddelandet synligt till alla.', required: false})
+          all: string,
+      interaction: CommandInteraction
+  ): Promise<void> {
+    const commands = MetadataStorage.instance.applicationCommands.map((cmd) => {
+      return { name: cmd.name, description: cmd.description };
     });
-    msg += "\t* " + cmd.help(prefix).trim() + "\n";
-    handled.set(cmd.name, cmd)
-    message.channel.send(msg).then(() => message.react('✅').catch((e) => console.log(e))).catch((e) => console.log(e))
+
+    const pages: MessageEmbed[] = []
+
+    const summary = new MessageEmbed().setFooter({text: 'Page 1 of ' + (commands.length + 1)}).setTitle('Alla kommandon').setDescription('De mesta kommandon kan också skrivas med `!`')
+    commands.map((cmd) => {
+      summary.addField('/'+cmd.name, cmd.description)
+    })
+
+    pages.push(summary)
+
+    pages.push(...commands.map((cmd, i) => {
+      return new MessageEmbed()
+        .setFooter({ text: `Page ${i + 2} of ${commands.length + 1}` })
+        .setTitle("**Slash kommando info**")
+        .addField("Namn", cmd.name)
+        .addField("Beskrivning", cmd.description);
+    }));
+
+    const pagination = new Pagination(interaction, pages, {ephemeral: all !== 'alla', type: "BUTTON"});
+    await pagination.send();
+  }
+
+  @SimpleCommand('help', {aliases: ['commands', 'all-commands', 'kommandon', 'hjälp']})
+  async helpList(command: SimpleCommandMessage){
+    const commands = MetadataStorage.instance.applicationCommands.map((cmd) => {
+      return { name: cmd.name, description: cmd.description };
+    });
+
+    const summary = new MessageEmbed().setTitle('Alla kommandon').setDescription('Alla kommandon kan också skrivas med `' + process.env.COMMAND_PREFIX ?? "!" + '`')
+    commands.map((cmd) => {
+      summary.addField('/'+cmd.name, cmd.description)
+    })
+    await command.message.reply({embeds: [summary]})
+  }
 }
