@@ -18,7 +18,7 @@ export abstract class HelpCMD {
 
     const pages: MessageEmbed[] = []
 
-    const summary = new MessageEmbed().setFooter({text: 'Page 1 of ' + (commands.length + 1)}).setTitle('Alla kommandon').setDescription('De mesta kommandon kan också skrivas med `!`')
+    const summary = new MessageEmbed().setFooter({text: 'Page 1 of ' + (commands.length + 1)}).setTitle('Alla kommandon').setDescription('De mesta kommandon kan också skrivas med `' + process.env.COMMAND_PREFIX ?? "!" + '`')
     commands.map((cmd) => {
       summary.addField('/'+cmd.name, cmd.description)
     })
@@ -43,7 +43,7 @@ export abstract class HelpCMD {
       return { name: cmd.name, description: cmd.description };
     });
 
-    const summary = new MessageEmbed().setTitle('Alla kommandon').setDescription('Alla kommandon kan också skrivas med `' + process.env.COMMAND_PREFIX ?? "!" + '`')
+    const summary = new MessageEmbed().setTitle('Alla kommandon').setDescription('De mesta kommandon kan också skrivas med `' + process.env.COMMAND_PREFIX ?? "!" + '`')
     commands.map((cmd) => {
       summary.addField('/'+cmd.name, cmd.description)
     })
