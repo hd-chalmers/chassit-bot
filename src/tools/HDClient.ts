@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 
 export default class HDClient {
     private _token: string;
-    private _endpoint: string = process.env.API_ENDPOINT ? process.env.API_ENDPOINT : "https://hd.chalmers.se/api"
+    private _endpoint: string = process.env.API_ENDPOINT ?? "https://hd.chalmers.se/api"
 
     constructor(token: string) {
         this._token = token;
