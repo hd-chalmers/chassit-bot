@@ -4,10 +4,10 @@ FROM node:17-alpine
 WORKDIR /usr/src/app
 
 # Move all files
-COPY ./dist /usr/src/app/
-COPY ./package.json /usr/src/app/
-COPY ./package-lock.json /usr/src/app/
-COPY ./node_modules /usr/src/app/node_modules
+COPY . /usr/src/app
+RUN npm i --include=dev
+RUN ls
+RUN npm run build
 
 # Start bot
-CMD [ "node", "main.js" ]
+CMD [ "node", "./dist/main.js" ]

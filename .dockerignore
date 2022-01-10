@@ -14,9 +14,8 @@
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
-src
+
 .idea
-tsconfig.json
 webpack.config.js
 .gitlab-ci.yml
 .gitignore
