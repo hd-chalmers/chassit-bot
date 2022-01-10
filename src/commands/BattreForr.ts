@@ -46,7 +46,8 @@ export default class BattreForrCMD extends Command{
                 json.allTime += 1
                 json.thisMonth += 1
 
-                await message.reply({content: `Bättre förr! (${json.thisMonth} gången denna månaden)`, allowedMentions: {repliedUser: false}})
+                //await message.reply({content: `Bättre förr! (${json.thisMonth} gången denna månaden)`, allowedMentions: {repliedUser: false}})
+                await message.react('❗')
 
                 fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
                     if(err){
@@ -193,7 +194,7 @@ export default class BattreForrCMD extends Command{
             json.allTime += 1
             json.thisMonth += 1
 
-            await command.reply({content: `Bättre förr! (${json.thisMonth} gången denna månaden)`, ephemeral: self === 'mig'})
+            await command.reply({content: `Bättre förr! (${json.thisMonth} gånger denna månaden)`, ephemeral: self === 'mig'})
 
             fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
                 if(err){
