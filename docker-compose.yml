@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  hd-bot:
+    restart: unless-stopped
+    volumes:
+      - ./data:/usr/src/app/data
+    build: .
+    env_file:
+      - .env
