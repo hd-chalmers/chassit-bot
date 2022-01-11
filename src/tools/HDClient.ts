@@ -33,7 +33,7 @@ export class DoorStatus {
     }
 
     get message() {
-        return `Chassit är ${this.statusTxt} och har varit det i ${this._duration_str} (<t:${new Date(this._updated).getTime() / 1000}:R>)`
+        return `Chassit är ${this.statusTxt} och har varit det i ${this._duration_str} (<t:${(new Date(this._updated).getTime() / 1000) - 3600}:R>)`
     }
 
     private get statusTxt(): "öppet" | "stängt" | "okänt"{
