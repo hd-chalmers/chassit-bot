@@ -45,11 +45,15 @@ client.once("ready", async () => {
      ...client.guilds.cache.map((g) => g.id)
     );*/
 
+
+  // Get door status from HD API periodically
   const hdClient = new HDClient('')
   setInterval(() => {
     if(client.user) {
       hdClient.door.then(res => {
-            if (res.status) {
+          
+          // Set bot to online when the door is open  
+          if (res.status) {
               client.user!.setPresence({
                 afk: false,
                 status: "online",
@@ -59,7 +63,9 @@ client.once("ready", async () => {
                   url: "https://hd.chalmers.se"
                 }]
               })
-            } else if (res.status === false) {
+            } 
+            // Set bot to Do Not Disturb when the door is closed
+            else if (res.status === false) {
               client.user!.setPresence({
                 afk: true,
                 status: "dnd",
@@ -69,7 +75,9 @@ client.once("ready", async () => {
                   url: "https://hd.chalmers.se",
                 }]
               })
-            } else {
+            } 
+            // Set bot to idle if the door api has an error
+            else {
               client.user!.setPresence({
                 afk: true,
                 status: "idle",
@@ -81,6 +89,7 @@ client.once("ready", async () => {
               })
             }
           },
+          // Set bot to idle if it fails to fetch from the HD api
           err => client.user!.setPresence({
             afk: true,
             status: "idle",
@@ -96,10 +105,12 @@ client.once("ready", async () => {
   log.success("Bot started");
 });
 
+// Set eventhandler to watch discord messages, needed for simple commands
 client.on("interactionCreate", (interaction: Interaction) => {
   client.executeInteraction(interaction);
 });
 
+// Set eventhanlder for interactions, needed for slash commands and such
 client.on("messageCreate", (message: Message) => {
   client.executeCommand(message).catch(e => log.error(e.message))
 });
@@ -112,4 +123,5 @@ async function run() {
   client.login(process.env.BOT_TOKEN ?? ""); // provide your bot token
 }
 
+// login the bot
 run();
