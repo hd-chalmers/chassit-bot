@@ -71,50 +71,49 @@ export default class QuoteCMD extends Command{
         // Create a MessageActionRow and add the button to that row.
         const row = new MessageActionRow().addComponents(firstbtn).addComponents(secondbtn);
 
-        setTimeout(() => {
-            command.fetchReply().then(data => {
-                const match = this.quotes.get(data.id)!
-                const disRow = new MessageActionRow().addComponents(match.firstBtn.setDisabled(true)).addComponents(match.secondBtn.setDisabled(true))
-                command.editReply({embeds: [embed], components: [disRow]})
-                this.log.info("timeout")
-                submitScores(match.firstQuoteID, match.secondQuoteID, match.firstCount.size, match.secondCount.size)
-                    .then(() => this.quotes.delete(data.id), (e) => this.log.error(e.toString()))
-            })
-        }, 888000)
-
         getQuoteMatch().then(msg => {
             embed = new MessageEmbed()
             try {
-                embed.addField('1⃣  ' + msg[0].quote, msg[0].context)
-                    .addField('2⃣  ' + msg[1].quote, msg[1].context)
-                    .setTimestamp(new Date().getTime() + 888000)
+                embed.addField('1⃣  ' + (msg[0].quote ?? "Ett citat som inte existerar (Null fixa pls)"), msg[0].context ?? "Mr. Okänd, (Null varför)")
+                    .addField('2⃣  ' + (msg[1].quote ?? "Ett citat som inte existerar (Null fixa pls)"), msg[1].context ?? "Mr. Okänd, (Null varför)")
+                    .setTimestamp(new Date().getTime() + 2100000)
                     .setFooter({text: 'Röstningen stängs:'})
                     .setTitle('Vilket citat är bäst?')
             }catch (e: any) {
                 this.log.error(e.message + '\n' + msg.toString())
-                this.log.error(msg.toString())
                 return
             }
-            command.editReply({embeds: [embed], components: [row]});
-            command.fetchReply().then(data => {
+            command.editReply({embeds: [embed], components: [row]})
+            .then(data => {
+                // Save data
                 this.quotes.set(data.id, {
                     firstBtn: firstbtn,
                     firstCount: new Set<string>(),
-                    firstQuoteID: msg[0].id,
+                    firstQuoteID: msg[0].id.toString(),
                     secondBtn: secondbtn,
                     secondCount: new Set<string>(),
-                    secondQuoteID: msg[1].id,
-                    embed: [embed]
+                    secondQuoteID: msg[1].id.toString(),
+                    msg: data as Message
                 })
-                this.log.info(data.id)
+
+                // Disabling voting after some time and submit the results
+                setTimeout(async () => {
+                        const match = this.quotes.get(data.id)!
+                        const disRow = new MessageActionRow().addComponents(match.firstBtn.setDisabled(true)).addComponents(match.secondBtn.setDisabled(true))
+                        await match.msg.edit({components: [disRow]})
+                    
+                        submitScores(match.firstQuoteID, match.secondQuoteID, match.firstCount.size, match.secondCount.size)
+                            .then(() => {}, (e) => this.log.error(e.toString()))
+                            .finally(() => this.quotes.delete(data.id))
+                }, 2100000)
             })
         }, err => this.log.error(err.message))
     }
 
     @ButtonComponent('first-btn')
     async voteFirst(command: ButtonInteraction){
-        this.log.info('voted first ' + command.message.id)
         if(!this.quotes.get(command.message.id)){
+            await this.log.error("vote failed due to message " + command.message.id + " is not available")
             return
         }
         const data = this.quotes.get(command.message.id)!
@@ -123,15 +122,14 @@ export default class QuoteCMD extends Command{
         data.firstBtn.setLabel(`Rösta första (${data.firstCount.size})`)
         data.secondBtn.setLabel(`Rösta andra (${data.secondCount.size})`)
         command.update({
-            embeds: data.embed,
             components: [new MessageActionRow().addComponents(data.firstBtn).addComponents(data.secondBtn)]
         }).then(() => this.quotes.set(command.message.id, data))
     }
 
     @ButtonComponent('second-btn')
     async voteSecond(command: ButtonInteraction){
-        this.log.info('voted second ' + command.message.id)
         if(!this.quotes.get(command.message.id)){
+            await this.log.error("vote failed due to message " + command.message.id + " is not available")
             return
         }
         const data = this.quotes.get(command.message.id)!
@@ -140,7 +138,6 @@ export default class QuoteCMD extends Command{
         data.firstBtn.setLabel(`Rösta första (${data.firstCount.size})`)
         data.secondBtn.setLabel(`Rösta andra (${data.secondCount.size})`)
         command.update({
-            embeds: data.embed,
             components: [new MessageActionRow().addComponents(data.firstBtn).addComponents(data.secondBtn)]
         }).then(() => this.quotes.set(command.message.id, data))
     }
@@ -170,7 +167,8 @@ export default class QuoteCMD extends Command{
     ){
         await command.deferReply({ephemeral: true})
 
-        if(password !== 'password'){
+
+        if(password !== process.env.RAVENHOLDT_PASS){
             await command.editReply({content: "Lösenordet var felaktig, försök igen"})
             return
         }
@@ -209,7 +207,7 @@ export default class QuoteCMD extends Command{
 }
 
 interface QuoteMatch{
-    embed: MessageEmbed[]
+    msg: Message,
     firstBtn: MessageButton,
     secondBtn: MessageButton,
     firstQuoteID: string,
