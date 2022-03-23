@@ -15,6 +15,9 @@ import {
 import {CommandInteraction, Message, MessageEmbed} from "discord.js";
 import * as fs from "fs";
 
+/**
+ * A class for handling commands and events regarding the 'bättre förr' counter
+ */
 @Discord()
 @SlashGroup("battreforr", "Ju längre förr ju bättre är det. Få statistik eller öka bättre förr räkningen.")
 export default class BattreForrCMD extends Command{
@@ -24,38 +27,18 @@ export default class BattreForrCMD extends Command{
     readonly name: string = "Bättre Förr";
     private log = new LoggerFactory(this.name)
 
+    /**
+     * A message listener that checks each message if it contains 'bättre förr' and increments the counter
+     * @param message the message to be checked
+     * @param client the bot client
+     */
     @On("messageCreate", {})
     async addCount([message]: [Message], client: Client){
+
         if(!message.author.bot && message.content.toLocaleLowerCase().includes("bättre förr")){
-            fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
-                let json: BFCount
-                if(data){
-                    json = JSON.parse(data)
-                    if(new Date(json.timestamp).getMonth() !== new Date().getMonth()){
-                        json.thisMonth = 0
-                        json.timestamp = new Date().toISOString()
-                    }
-                } else {
-                    json = {
-                        allTime: 0,
-                        thisMonth: 0,
-                        timestamp: new Date().toISOString()
-                    }
-                }
+            await this.incrementInFile()
 
-                json.allTime += 1
-                json.thisMonth += 1
-
-                //await message.reply({content: `Bättre förr! (${json.thisMonth} gången denna månaden)`, allowedMentions: {repliedUser: false}})
-                await message.react('❗')
-
-                fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
-                    if(err){
-                        this.log.error(err.message)
-                    }
-                })
-            })
-
+            await message.react('❗')
         }
     }
 
@@ -68,27 +51,7 @@ export default class BattreForrCMD extends Command{
     ){
         await command.deferReply({ephemeral: self === 'mig'})
 
-        fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
-            let json: BFCount
-            if (data) {
-                json = JSON.parse(data)
-                if (new Date(json.timestamp).getMonth() !== new Date().getMonth()) {
-                    json.thisMonth = 0
-                    json.timestamp = new Date().toISOString()
-
-                    fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
-                        if(err){
-                            this.log.error(err.message)
-                        }
-                    })
-                }
-            } else {
-                json = {
-                    allTime: 0,
-                    thisMonth: 0,
-                    timestamp: new Date().toISOString()
-                }
-            }
+        const json = await this.readFile()
 
             const embed = new MessageEmbed()
                 .setTitle("Bättre Förr statistik")
@@ -96,33 +59,11 @@ export default class BattreForrCMD extends Command{
                 .addField("Antal gånger denna månaden", json.thisMonth.toString())
                 .setTimestamp(new Date())
             await command.editReply({embeds: [embed]})
-        })
     }
 
     @SimpleCommand('battreforr', {aliases: ['bättreförr', 'bättreFörr', 'BättreFörr']})
     async statsTxt(command: SimpleCommandMessage){
-
-        fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
-            let json: BFCount
-            if (data) {
-                json = JSON.parse(data)
-                if (new Date(json.timestamp).getMonth() !== new Date().getMonth()) {
-                    json.thisMonth = 0
-                    json.timestamp = new Date().toISOString()
-
-                    fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
-                        if(err){
-                            this.log.error(err.message)
-                        }
-                    })
-                }
-            } else {
-                json = {
-                    allTime: 0,
-                    thisMonth: 0,
-                    timestamp: new Date().toISOString()
-                }
-            }
+            const json = await this.readFile()
 
             const embed = new MessageEmbed()
                 .setTitle("Bättre Förr statistik")
@@ -130,7 +71,6 @@ export default class BattreForrCMD extends Command{
                 .addField("Antal gånger denna månaden", json.thisMonth.toString())
                 .setTimestamp(new Date())
             await command.message.reply({embeds: [embed]})
-        })
     }
 
 
@@ -139,31 +79,7 @@ export default class BattreForrCMD extends Command{
     async pingCMD(command: CommandInteraction) {
         await command.reply({content: "Pingar sittande...", ephemeral: true})
 
-        fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
-            let json: BFCount
-            if (data) {
-                json = JSON.parse(data)
-                if (new Date(json.timestamp).getMonth() !== new Date().getMonth()) {
-                    json.thisMonth = 0
-                    json.timestamp = new Date().toISOString()
-                }
-            } else {
-                json = {
-                    allTime: 0,
-                    thisMonth: 0,
-                    timestamp: new Date().toISOString()
-                }
-            }
-
-            json.allTime += 1
-            json.thisMonth += 1
-
-            fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
-                if(err){
-                    this.log.error(err.message)
-                }
-            })
-        })
+        await this.incrementInFile()
 
         await command.followUp({content: "<@&402465299414253568> Bättre Förr!", ephemeral: false})
     }
@@ -175,30 +91,55 @@ export default class BattreForrCMD extends Command{
         self: string,
         command: CommandInteraction
     ){
-        fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
-            let json: BFCount
-            if(data){
-                json = JSON.parse(data)
-                if(new Date(json.timestamp).getMonth() !== new Date().getMonth()){
-                    json.thisMonth = 0
-                    json.timestamp = new Date().toISOString()
+        await command.deferReply({ephemeral: self === 'mig'})
+
+        let json = await this.incrementInFile()
+
+        await command.editReply({content: `Bättre förr! (${json.thisMonth} gånger denna månaden)`})
+    }
+
+    private async readFile(): Promise<BFCount>{
+        return new Promise<BFCount>((resolve, reject) => {
+            fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
+                if (err){
+                    reject(err)
+                    return
                 }
-            } else {
-                json = {
-                    allTime: 0,
-                    thisMonth: 0,
-                    timestamp: new Date().toISOString()
+
+                let json: BFCount
+                if(data){
+                    json = JSON.parse(data)
+                    // if there's a new month then reset the monthly counter
+                    if(new Date(json.timestamp).getMonth() !== new Date().getMonth()){
+                        json.thisMonth = 0
+                        json.timestamp = new Date().toISOString()
+                    }
+                    // create a new object if the file is missing
+                } else {
+                    json = {
+                        allTime: 0,
+                        thisMonth: 0,
+                        timestamp: new Date().toISOString()
+                    }
                 }
-            }
+                resolve(json)
+            })
+        })
+    }
 
-            json.allTime += 1
-            json.thisMonth += 1
+    private async incrementInFile(amount?: number): Promise<BFCount>{
+        const json = await this.readFile()
 
-            await command.reply({content: `Bättre förr! (${json.thisMonth} gånger denna månaden)`, ephemeral: self === 'mig'})
+        json.allTime += amount ?? 1
+        json.thisMonth += amount ?? 1
 
+        return new Promise((resolve, reject) => {
             fs.writeFile("./data/BattreForrCount.json", JSON.stringify(json), {encoding: "utf-8"}, (err) => {
                 if(err){
                     this.log.error(err.message)
+                    reject(err)
+                } else {
+                    resolve(json)
                 }
             })
         })
