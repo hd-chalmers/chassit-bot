@@ -4,6 +4,9 @@ import {Discord, SimpleCommand, SimpleCommandMessage, Slash, SlashChoice, SlashO
 import LoggerFactory from "../tools/LogStyles.js";
 import {CommandInteraction} from "discord.js";
 
+/**
+ * A class for responding to cmds regarding the chassit door
+ */
 @Discord()
 export default class DoorCMD extends Command{
     readonly alias: string[] = ["door"]
@@ -13,22 +16,32 @@ export default class DoorCMD extends Command{
     private log = new LoggerFactory(this.name)
     private hdClient = new HDClient('');
 
+    /**
+     * A message command '!door' where the bot responds with door status and timestamp
+     * @param command
+     * @param args
+     */
     @SimpleCommand('Door', {aliases: ['door']} )
     async resolve(command: SimpleCommandMessage, args: string[]) {
         this.hdClient.door.then(res => {
-            console.log(res.message)
             command.message.reply(res.message);
         }, err => {
             this.log.error(err.message)
         })
     }
 
+    /**
+     * A slash command for getting the status and timestamp regarding chassit door
+     * @param self an argument that decides if the message should be ephemeral
+     * @param command the slash command interaction
+     */
     @Slash('door', {description: "Är chassit öppet?"})
     async slashResolve(
         @SlashChoice('migEndast', 'mig')
         @SlashOption('synlighet', {description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
-            self: string,
+            self: string | undefined,
         command: CommandInteraction) {
+
         await command.deferReply({ephemeral: self === 'mig'})
         this.hdClient.door.then(res => {
             command.editReply(res.message)

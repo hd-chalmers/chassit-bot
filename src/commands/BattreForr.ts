@@ -42,6 +42,11 @@ export default class BattreForrCMD extends Command{
         }
     }
 
+    /**
+     * A slash command for showing the bättre förr stats
+     * @param self an argument deciding if the message should be ephemeral
+     * @param command the slash command interaction
+     */
     @Slash('stats', {description: 'Få statistik om hur många gånger bättre förr har sagts'})
     async statsCMD(
         @SlashChoice('migEndast', 'mig')
@@ -61,6 +66,10 @@ export default class BattreForrCMD extends Command{
             await command.editReply({embeds: [embed]})
     }
 
+    /**
+     * A message command as '!battreforr' for showing a statistics embed
+     * @param command the message with the command
+     */
     @SimpleCommand('battreforr', {aliases: ['bättreförr', 'bättreFörr', 'BättreFörr']})
     async statsTxt(command: SimpleCommandMessage){
             const json = await this.readFile()
@@ -74,7 +83,10 @@ export default class BattreForrCMD extends Command{
     }
 
 
-
+    /**
+     * A command for anonymously pinging the 'sittande' role and incrementing the counter
+     * @param command the command interaction
+     */
     @Slash('ping', {description: "Skicka `Bättre förr` till sittande"})
     async pingCMD(command: CommandInteraction) {
         await command.reply({content: "Pingar sittande...", ephemeral: true})
@@ -84,6 +96,11 @@ export default class BattreForrCMD extends Command{
         await command.followUp({content: "<@&402465299414253568> Bättre Förr!", ephemeral: false})
     }
 
+    /**
+     * A slash command for simply incrementing the counter
+     * @param self an argument that decides if the message should be ephemeral
+     * @param command the slash command interaction
+     */
     @Slash('inkrementera', {description: 'Öka bättre förr räknaren'})
     async increment(
         @SlashChoice('migEndast', 'mig')
@@ -98,6 +115,11 @@ export default class BattreForrCMD extends Command{
         await command.editReply({content: `Bättre förr! (${json.thisMonth} gånger denna månaden)`})
     }
 
+    /**
+     * A helper method for reading the data/BattreForrCount.json and parsing it into an object
+     * @return BFCount A promise when resolved returns an object containing all-time count, month counr and timestamp
+     * @private
+     */
     private async readFile(): Promise<BFCount>{
         return new Promise<BFCount>((resolve, reject) => {
             fs.readFile("./data/BattreForrCount.json", "utf-8", async (err, data) => {
@@ -127,6 +149,13 @@ export default class BattreForrCMD extends Command{
         })
     }
 
+    /**
+     * A method that reads the json file, increments the values and writes to the json file
+     * @param amount an optional parameter for the amount that should be added to the counters, defaults to 1
+     * @private
+     * @return BFCount returns a promise that contains a BFCount object, it rejects when the write fails
+     * @see readFile
+     */
     private async incrementInFile(amount?: number): Promise<BFCount>{
         const json = await this.readFile()
 
@@ -146,6 +175,9 @@ export default class BattreForrCMD extends Command{
     }
 }
 
+/**
+ * An object of counters and a timestamp
+ */
 interface BFCount{
     allTime: number,
     thisMonth: number,

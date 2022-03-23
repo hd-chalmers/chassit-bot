@@ -2,6 +2,12 @@ import {MessageEmbed} from "discord.js";
 import fetch from "node-fetch";
 import {FormData} from "formdata-node";
 
+/**
+ * Obtain a random quote from quote.ravenholdt.se and format it to message embed
+ * @param threshHold the minimum rating allowed for fetched quotes
+ * @return MessageEmbed
+ * @async
+ */
 export async function getRandomQuote(threshHold: number): Promise<MessageEmbed> {
     let url: string = "https://quote.ravenholdt.se/api/random.php"
     let ret: MessageEmbed
@@ -25,7 +31,12 @@ export async function getRandomQuote(threshHold: number): Promise<MessageEmbed> 
     return promise;
 }
 
-export async function getQuoteMatch(){
+/**
+ * Get a pair of quotes from quote.ravenholdt.se to be used for a quote vote
+ * @return A {@link quoteType}[] if promise resolves
+ * @async
+ */
+export async function getQuoteMatch(): Promise<quoteType[]>{
     const url: string = "https://quote.ravenholdt.se/api/update.php"
     return new Promise<any>((resolve, reject) => {
         fetch(url, {
@@ -42,6 +53,13 @@ export async function getQuoteMatch(){
     })
 }
 
+/**
+ * Submit a match between two quotes in order to change their ranking on quote.ravenholdt.se
+ * @param id1 id of the first quote
+ * @param id2 id of the second quote
+ * @param score1 amount of votes for the first quote
+ * @param score2 amount of votes for the second quote
+ */
 export async function submitScores(id1: string, id2: string, score1: number, score2: number): Promise<void>{
     const url: string = "https://quote.ravenholdt.se/api/update.php"
     const body = JSON.stringify({
@@ -53,7 +71,6 @@ export async function submitScores(id1: string, id2: string, score1: number, sco
         swipe: false
     })
 
-    console.log(body)
     return new Promise((resolve, reject) => {
         fetch(url, {
             method: 'POST',
@@ -69,6 +86,12 @@ export async function submitScores(id1: string, id2: string, score1: number, sco
 
 }
 
+/**
+ * converts html format tags to discord markdown
+ * @param str the string containing html tags
+ * @return A string formatted to discord markdown
+ * @async
+ */
 export async function convertHTMLToMD(str:string): Promise<string>{
     return new Promise(resolve => {
         const s = str.replace('<br>', '\n')
@@ -90,13 +113,17 @@ export async function convertHTMLToMD(str:string): Promise<string>{
     })
 }
 
+/**
+ * Submit a new quote to quote.ravenholdt.se
+ * @param quote A quote in the format: "quote" - Speaker, context
+ */
 export async function submitQuote(quote: string): Promise<void>{
     const url = "https://quote.ravenholdt.se/submit/"
     const data = new FormData() as any
     data.append("quote", quote)
-    data.append("pass", "password")
+    data.append("pass", process.env.RAVENHOLDT_PASS)
 
-    return new Promise(((resolve, reject) => {
+    return new Promise((async (resolve, reject) => {
         fetch(url, {
             method: "POST",
             body: data
@@ -110,10 +137,16 @@ export async function submitQuote(quote: string): Promise<void>{
     }))
 }
 
+/** A type used for quote.ravenholdt.se responses */
 interface quoteType {
+    /** quote id */
     id: number,
+    /** the quote */
     quote: string,
+    /** the speaker and context */
     context: string,
+    /** total ranking points from votes */
     rating: number,
+    /** amount of matches the quote has encountered */
     matches: number
 }

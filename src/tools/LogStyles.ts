@@ -43,28 +43,30 @@ export const LogStyle = {
     }
 };
 
+/** A class for creating styled logging and with source names */
 export default class LoggerFactory{
     private readonly _name: string
 
+    /** Creates a logger object which saves the name and enables multiple styled logs */
     constructor(name: string) {
         this._name = name
     }
 
-    // Write info styled in console and in log file
+    /** Write info level logs that is styled in console */
     async info(message: string): Promise<void>{
         const date = new Date().toISOString()
         // Write to console
         console.info(LogStyle.bg.blue + LogStyle.fg.white + ` ${date} | ${this._name} ` + LogStyle.reset + ' ' + message)
     }
 
-    // Write info styled in console and in log file
+    /** Write info level logs that is green styled in console */
     async success(message: string): Promise<void>{
         const date = new Date().toISOString()
         // Write to console
         console.info(LogStyle.bg.green + LogStyle.fg.black + ` ${date} | ${this._name} ` + LogStyle.reset + ' ' + message)
     }
 
-    // Write a warning styled in console and in log file
+    /** Write warning level logs that is styled in console */
     async warn(message: string): Promise<void>{
         const date = new Date().toISOString()
         // Write styled message to console
@@ -75,7 +77,7 @@ export default class LoggerFactory{
         )
     }
 
-    // Write an error message styled in console and in log files
+    /** Write error level logs that is styled in console */
     async error(message: string, stacktrace?: string): Promise<void>{
         const date = new Date().toISOString()
         // Write to console

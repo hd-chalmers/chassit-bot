@@ -5,7 +5,7 @@ export default class HDClient {
     /** The api token needed for accessing protected api routes */
     private _token: string;
     /** The url used in HD API calls 
-     * @defaultvalue "https://hd.chalmers.se/api" 
+     * @default-value "https://hd.chalmers.se/api"
      */
     private _endpoint: string = process.env.API_ENDPOINT ?? "https://hd.chalmers.se/api"
 
@@ -17,7 +17,7 @@ export default class HDClient {
         this._token = token;
     }
 
-    /** Makes a API call to /door and formats it to a {@link DoorStatus} object
+    /** Makes an API call to /door and formats it to a {@link DoorStatus} object
      * @async 
      * @returns {Promise<DoorStatus>} Returns a promise which may return {@link DoorStatus} on resolve or an {@link Error} on reject
      */
@@ -40,12 +40,12 @@ export class DoorStatus {
     private readonly _duration: number;
     /** A string about how long since the duration since status changed */
     private readonly _duration_str: string;
-    /** The timestamp of when the status chnaged */
+    /** The timestamp of when the status changed */
     private readonly _updated: Date;
 
     /**
      * Creates a {@link DoorStatus} object which contains door status and timestamp of change
-     * @param response A json object which has the properties status, duration, duration_str and updated
+     * @param response A json object which has the properties' status, duration, duration_str and updated
      */
     constructor(response: any) {
         this._status = response.status;
@@ -75,7 +75,7 @@ export class DoorStatus {
         return this._status;
     }
 
-    /** A unixtimestamp of the amount of seconds since the status changed */
+    /** A unix timestamp of the amount of seconds since the status changed */
     get duration(): number {
         return this._duration;
     }
@@ -85,7 +85,7 @@ export class DoorStatus {
         return this._duration_str;
     }
 
-    /** The timestamp of when the status chnaged */
+    /** The timestamp of when the status changed */
     get updated(): Date {
         return this._updated;
     }
