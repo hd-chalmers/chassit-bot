@@ -39,7 +39,7 @@ export default class DoorCMD extends Command{
     async slashResolve(
         @SlashChoice('migEndast', 'mig')
         @SlashOption('synlighet', {description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
-            self: string | undefined,
+            self: string,
         command: CommandInteraction) {
 
         await command.deferReply({ephemeral: self === 'mig'})
