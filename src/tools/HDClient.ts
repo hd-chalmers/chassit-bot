@@ -56,7 +56,7 @@ export class DoorStatus {
 
     /** Generates a string message about door status and when the status changed */
     get message() {
-        return `Chassit är ${this.statusTxt} och har varit det i ${this._duration_str} (<t:${(new Date(this._updated).getTime() / 1000) - 3600}:R>)`
+        return `Chassit är ${this.statusTxt} och har varit det i ${this._duration_str} (<t:${Math.floor(new Date().getTime() / 1000) - this.duration}:R>)`
     }
 
     /** Returns a status string based on {@link _status} */
