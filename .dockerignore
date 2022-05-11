@@ -21,5 +21,6 @@ webpack.config.js
 .gitignore
 *.iml
 Dockerfile
+src/commands/examples/
 
 
