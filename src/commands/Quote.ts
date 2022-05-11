@@ -54,7 +54,7 @@ export default class QuoteCMD extends Command{
      */
     @Slash('quote', {description: 'Få ett slumpmässigt citat från citat listan'})
     async slashResolve(
-        @SlashChoice('migEndast', 'mig')
+        @SlashChoice({name: "migEndast", value: "mig"})
         @SlashOption('synlighet', {description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
             self: string,
         command: CommandInteraction) {

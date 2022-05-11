@@ -28,10 +28,10 @@ export default class MasterCMD extends Command{
      */
     @Slash("whoisyourmaster", {description: 'Vem är mästaren?'})
     async slashResolve(
-        @SlashChoice('migEndast', 'mig')
+        @SlashChoice({name: "migEndast", value: "mig"})
         @SlashOption('synlighet', {description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
             self: string,
         command: CommandInteraction){
-        await command.reply({content: 'My only masters are the almighty Sysads!... or those that actually do stuff.', ephemeral: self === 'mig'})
+        await command.reply({content: 'My only masters are the almighty Sysads!... or those that changed my programming.', ephemeral: self === 'mig'})
     }
 }

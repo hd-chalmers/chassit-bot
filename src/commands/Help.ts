@@ -1,6 +1,6 @@
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import {CommandInteraction, MessageEmbed} from "discord.js";
 import {Discord, MetadataStorage, SimpleCommand, SimpleCommandMessage, Slash, SlashChoice, SlashOption} from "discordx";
-import { Pagination } from "@discordx/pagination";
+import {Pagination, PaginationType} from "@discordx/pagination";
 
 /**
  * A class for handling all the help commands
@@ -15,7 +15,7 @@ export abstract class HelpCMD {
    */
   @Slash("help", { description: "Få en beskrivning om alla kommandon" })
   async pages(
-      @SlashChoice('alla', 'alla')
+      @SlashChoice('alla')
       @SlashOption('synlighet', {description: 'Lägg till "alla" för att ha meddelandet synligt till alla.', required: false})
           all: string,
       interaction: CommandInteraction
@@ -45,7 +45,7 @@ export abstract class HelpCMD {
         .addField("Beskrivning", (cmd.type === "CHAT_INPUT" ? cmd.description: 'Höger klicka ett meddelande eller en användare och kolla under "Apps" för att nå kommandot'));
     }));
 
-    const pagination = new Pagination(interaction, pages, {ephemeral: all !== 'alla', type: "BUTTON"});
+    const pagination = new Pagination(interaction, pages, {type: PaginationType.Button, ephemeral: all !== 'alla'});
     await pagination.send();
   }
 

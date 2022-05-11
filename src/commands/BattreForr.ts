@@ -1,10 +1,8 @@
 import {Command} from "../tools/Command.js";
 import LoggerFactory from "../tools/LogStyles.js";
 import {
-    ArgsOf,
     Client,
     Discord,
-    Guard,
     On,
     SimpleCommand,
     SimpleCommandMessage,
@@ -19,7 +17,10 @@ import * as fs from "fs";
  * A class for handling commands and events regarding the 'bättre förr' counter
  */
 @Discord()
-@SlashGroup("battreforr", "Ju längre förr ju bättre är det. Få statistik eller öka bättre förr räkningen.")
+// create slashgroup for commands
+@SlashGroup({name:"battreforr", description:"Ju längre förr ju bättre är det. Få statistik eller öka bättre förr räkningen."})
+// make all slash commands inherit the slashgroup
+@SlashGroup("battreforr")
 export default class BattreForrCMD extends Command{
     readonly alias: string[] = [];
     readonly argDescription: string = "";
@@ -49,14 +50,14 @@ export default class BattreForrCMD extends Command{
      */
     @Slash('stats', {description: 'Få statistik om hur många gånger bättre förr har sagts'})
     async statsCMD(
-        @SlashChoice('migEndast', 'mig')
+        @SlashChoice({name: "migEndast", value: "mig"})
         @SlashOption('synlighet', {type: 'STRING', description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
             self: string,
         command: CommandInteraction
     ){
         await command.deferReply({ephemeral: self === 'mig'})
 
-        const json = await this.readFile()
+        const json = await this.readFile().then(data => data, err => {return {allTime: 0, thisMonth: 0} as BFCount})
 
             const embed = new MessageEmbed()
                 .setTitle("Bättre Förr statistik")
@@ -103,7 +104,7 @@ export default class BattreForrCMD extends Command{
      */
     @Slash('inkrementera', {description: 'Öka bättre förr räknaren'})
     async increment(
-        @SlashChoice('migEndast', 'mig')
+        @SlashChoice({name: "migEndast", value: "mig"})
         @SlashOption('synlighet', {type: 'STRING', description: 'Lägg till "migEndast" för att ha meddelandet endast synligt till dig.', required: false})
         self: string,
         command: CommandInteraction
@@ -157,7 +158,7 @@ export default class BattreForrCMD extends Command{
      * @see readFile
      */
     private async incrementInFile(amount?: number): Promise<BFCount>{
-        const json = await this.readFile()
+        const json = await this.readFile().then(data => data, err => { return {allTime: 0, thisMonth: 0, timestamp: new Date().toISOString()} as BFCount })
 
         json.allTime += amount ?? 1
         json.thisMonth += amount ?? 1
