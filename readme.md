@@ -39,17 +39,17 @@
 
 # Installation
 
-- `git clone https://github.com/oceanroleplay/discord.ts-example`
-- `cd discord.ts-example`
-- `npm install`
-- `npm run build`
+- `yarn install -D`
+- `yarn run build`
 - `set BOT_TOKEN=<your bot token>`
 
   if you don't have token yet than create one at [discord developer portal](https://discord.com/developers/)
 
-- `npm run start`
+- `yarn run start`
 
 you are done, you will see your bot up and running. For detailed installation guide, please [see this](https://oceanroleplay.github.io/discord.ts/docs/installation)
+
+A faster way to test the bot is to run `yarn run dev` and create a `.env` file based on the `.env.example` file.
 
 # Use global command only
 
