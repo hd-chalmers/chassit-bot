@@ -17,7 +17,7 @@ export async function getRandomQuote(threshHold: number): Promise<MessageEmbed> 
             ret = new MessageEmbed({
                 description: "",
                 fields: [
-                    {name: await convertHTMLToMD(res.quote), value: await convertHTMLToMD(res.context)}
+                    {name: (await convertHTMLToMD(res.quote)) ?? "empty quote :(", value: (await convertHTMLToMD(res.context)) ?? "empty context :("}
                 ],
                 footer: {text: "Rating: " + res.rating}
             })
@@ -92,7 +92,7 @@ export async function submitScores(id1: string, id2: string, score1: number, sco
  * @return A string formatted to discord markdown
  * @async
  */
-export async function convertHTMLToMD(str:string): Promise<string>{
+export async function convertHTMLToMD(str:string): Promise<string | null>{
     return new Promise(resolve => {
         const s = str.replace('<br>', '\n')
             .replaceAll('</br>', '\n')
@@ -108,6 +108,12 @@ export async function convertHTMLToMD(str:string): Promise<string>{
             .replaceAll('</del>', '~~')
             .replaceAll('<ins>', '__')
             .replaceAll('</ins>', '__')
+            .trim()
+
+        if(s === ''){
+            resolve(null)
+            return
+        }
 
         resolve(s)
     })

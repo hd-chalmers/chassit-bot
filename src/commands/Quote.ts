@@ -14,7 +14,7 @@ import {
 import {
     ButtonInteraction,
     CommandInteraction,
-    ContextMenuInteraction, Message,
+    Message,
     MessageActionRow,
     MessageButton, MessageContextMenuInteraction,
     MessageEmbed
@@ -93,8 +93,8 @@ export default class QuoteCMD extends Command{
         getQuoteMatch().then(qts => {
             embed = new MessageEmbed()
             try {
-                embed.addField('1⃣  ' + (qts[0].quote ?? "Ett citat som inte existerar (Null fixa pls)"), qts[0].context ?? "Mr. Okänd, (Null varför)")
-                    .addField('2⃣  ' + (qts[1].quote ?? "Ett citat som inte existerar (Null fixa pls)"), qts[1].context ?? "Mr. Okänd, (Null varför)")
+                embed.addField('1⃣  ' + (qts[0].quote ?? "Empty quote :("), (qts[0].context ?? "Empty context :("))
+                    .addField('2⃣  ' + (qts[1].quote ?? "Empty quote :("), (qts[1].context ?? "Empty context :("))
                     .setTimestamp(new Date().getTime() + 2100000)
                     .setFooter({text: 'Röstningen stängs:'})
                     .setTitle('Vilket citat är bäst?')
