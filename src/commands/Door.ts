@@ -47,6 +47,7 @@ export default class DoorCMD extends Command{
             command.editReply(res.message)
         }, err => {
             this.log.error(err.message)
+            command.editReply("Det gick inte att hämta statusen från APIn")
         })
     }
 }

@@ -62,7 +62,10 @@ export default class QuoteCMD extends Command{
 
         getRandomQuote(0).then(msg => {
             command.editReply({embeds: [msg]});
-        }, err => this.log.error(err.message))
+        }, err => {
+            this.log.error(err.message)
+            command.editReply("Det uppstod ett fel: " + err.message)
+        })
     }
 
     /**
@@ -99,7 +102,8 @@ export default class QuoteCMD extends Command{
                     .setFooter({text: 'Röstningen stängs:'})
                     .setTitle('Vilket citat är bäst?')
             }catch (e: any) {
-                this.log.error(e.message + '\n' + qts.toString())
+                this.log.error(e.message)
+                command.editReply("Det uppstod ett internt fel: " + e.message)
                 return
             }
             command.editReply({embeds: [embed], components: [row]})
@@ -126,7 +130,10 @@ export default class QuoteCMD extends Command{
                             .finally(() => this.quotes.delete(data.id))
                 }, 2100000)
             })
-        }, err => this.log.error(err.message))
+        }, err => {
+            this.log.error(err.message)
+            command.editReply("Det gick inte att hämta citatet från quote.ravenholdt.se")
+        })
     }
 
     /**
