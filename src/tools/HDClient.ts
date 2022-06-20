@@ -1,9 +1,13 @@
 import fetch from "node-fetch";
+import LoggerFactory from "./LogStyles.js";
 
 /** A class made for accessing various HD APIs */
 export default class HDClient {
     /** The api token needed for accessing protected api routes */
     private _token: string;
+    /** The endpoint for the HD API */
+    private readonly log = new LoggerFactory("HDClient");
+
     /** The url used in HD API calls 
      * @default-value "https://hd.chalmers.se/api"
      */
@@ -26,6 +30,7 @@ export default class HDClient {
             fetch(this._endpoint + "/door").then(res => res.json()).then(res => {
                 resolve(new DoorStatus(res));
             }).catch(err => {
+                this.log.error(err.message)
                 reject(err);
             });
         })

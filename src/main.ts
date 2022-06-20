@@ -1,10 +1,11 @@
 import "reflect-metadata";
-import { Intents, Interaction, Message } from "discord.js";
+import {ActivitiesOptions, Intents, Interaction, Message} from "discord.js";
 import { Client } from "discordx";
 import { dirname, importx } from "@discordx/importer";
 import dotenv from 'dotenv'
 import LoggerFactory from "./tools/LogStyles.js";
-import HDClient from "./tools/HDClient.js";
+import HDClient, {DoorStatus} from "./tools/HDClient.js";
+import NowPlayingClient from "./tools/NowPlayingClient.js";
 
 const log = new LoggerFactory('Bot')
 
@@ -48,58 +49,56 @@ client.once("ready", async () => {
 
   // Get door status from HD API periodically
   const hdClient = new HDClient('')
-  setInterval(() => {
+  const nowPlayingClient = new NowPlayingClient()
+
+  setInterval(async () => {
     if(client.user) {
-      hdClient.door.then(res => {
-          
-          // Set bot to online when the door is open  
-          if (res.status) {
-              client.user!.setPresence({
-                afk: false,
-                status: "online",
-                activities: [{
-                  name: "/help",
-                  type: "PLAYING",
-                  url: "https://hd.chalmers.se"
-                }]
-              })
-            } 
-            // Set bot to Do Not Disturb when the door is closed
-            else if (res.status === false) {
-              client.user!.setPresence({
-                afk: true,
-                status: "dnd",
-                activities: [{
-                  name: "/help",
-                  type: "PLAYING",
-                  url: "https://hd.chalmers.se",
-                }]
-              })
-            } 
-            // Set bot to idle if the door api has an error
-            else {
-              client.user!.setPresence({
-                afk: true,
-                status: "idle",
-                activities: [{
-                  name:  "/help",
-                  type: "PLAYING",
-                  url: "https://hd.chalmers.se",
-                }]
-              })
-            }
-          },
-          // Set bot to idle if it fails to fetch from the HD api
-          err => client.user!.setPresence({
+      const pdoor = hdClient.door.then(res => res,
+              err => new DoorStatus({status: null, duration: 0, duration_str: "", updated: undefined}))
+      const psong = nowPlayingClient.song.then(res => res, err => null)
+      // let all promises resolve
+      const res = await pdoor
+      const song = await psong
+
+      // constructs a presence based on if there is a song playing or not
+       const activities: ActivitiesOptions[] = [{
+         name: "/help",
+         type: "PLAYING",
+         url: "https://hd.chalmers.se"
+       }]
+
+      if(song){
+        activities.unshift({
+          name: song.title + " - " + song.artist,
+          type: "LISTENING"
+        })
+      }
+
+      // Set bot to online when the door is open
+      if (res.status) {
+          client.user!.setPresence({
+            afk: false,
+            status: "online",
+            activities
+          })
+        }
+        // Set bot to Do Not Disturb when the door is closed
+        else if (res.status === false) {
+          client.user!.setPresence({
+            afk: true,
+            status: "dnd",
+            activities
+          })
+        }
+        // Set bot to idle if the door api has an error
+        else {
+          client.user!.setPresence({
             afk: true,
             status: "idle",
-            activities: [{
-              name: "/help",
-              type: "PLAYING",
-              url: "https://hd.chalmers.se",
-            }]
-          }))
-    }
+            activities
+          })
+        }
+      }
   }, 5000)
 
   log.success("Bot started");
