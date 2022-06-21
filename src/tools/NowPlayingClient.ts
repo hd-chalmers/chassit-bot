@@ -7,6 +7,7 @@ import fetch from "node-fetch";
 export default class NowPlayingClient{
     /** The endpoint for the HD API */
     private _endpoint: string = process.env.API_ENDPOINT ?? "https://hd.chalmers.se/api"
+    private _token: string = process.env.API_TOKEN ?? ""
     /** The logger for this class */
     private readonly logger: LoggerFactory = new LoggerFactory('nowplaying')
 
@@ -17,7 +18,11 @@ export default class NowPlayingClient{
      */
     get song(): Promise<Songdata| null>{
         return new Promise((resolve, reject) => {
-            fetch(this._endpoint + "/nowplaying").then(res => res.json()).then(res => {
+            fetch(this._endpoint + "/nowplaying",{
+                headers: {
+                    Authorization: this._token
+                }
+            }).then(res => res.json()).then(res => {
                 resolve((res as {nowplaying: Songdata | null}).nowplaying);
             }).catch(err => {
                 this.logger.error(err.message)
